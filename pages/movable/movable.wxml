@@ -1,0 +1,5 @@
+<!--pages/movable/movable.wxml-->
+<wxs module="test" src="./test.wxs"></wxs> 
+<view class="area" style='position:relative;width:100%;height:100%;'>
+  <view class="movable" style="position:absolute;width:100px;height:100px;background:red;"></view>
+</view>

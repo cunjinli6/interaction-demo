@@ -1,0 +1,38 @@
+var func = function (source, target, context) {
+  // console.log('111', JSON.stringify(source.event.detail))
+  if (source.first) {
+    context.startX = context.lastLeft
+    context.startY = context.lastTop
+    return {
+      style: {
+        left: context.startX + 'px',
+        top: context.startY + 'px'
+      }
+    }
+  }
+  var event = source.event
+  var pageX = (event.touches[0]||event.changedTouches[0]).pageX
+  var pageY = (event.touches[0] || event.changedTouches[0]).pageY
+  if (event.type === 'touchstart') {
+    context.startX = pageX
+    context.startY = pageY
+  } else if (event.type === 'touchmove') {
+    var left = pageX - context.startX + context.lastLeft
+    var top = pageY - context.startY + context.lastTop
+    context.startX = pageX
+    context.startY = pageY
+    context.lastLeft = left
+    context.lastTop = top
+    // console.log('idff', pageX - context.startX, left, top)
+    return {
+      style: {
+        left: left + 'px',
+        top: top + 'px'
+      }
+    }
+
+  }
+}
+module.exports = {
+  func: func
+}

@@ -1,0 +1,39 @@
+var funcA = function (source, target, context) {
+  // console.log('source is', JSON.stringify(source))
+  var scrollTop = source.event.detail.scrollTop
+  if (scrollTop > 60) {
+    return {
+      style: {
+        "background-color": 'rgba(00, 00, 00, 1)'
+      },
+      class: 'page-group-position'
+    }
+  } else {
+    return {
+      style: {
+        "background-color": 'rgba(00, 00, 00, ' + Math.max(0, (scrollTop) / 60) + ')'
+      },
+      class: ''
+    }
+  }
+}
+module.exports = {
+  funcA: funcA,
+  funcB: function(source, target, context) {
+    console.log('1111', JSON.stringify(source))
+    var scrollTop = source.event.detail.scrollTop
+    if (scrollTop > 60) {
+      return {
+        style: {
+          "opacity": '0'
+        }
+      }
+    } else {
+      return {
+        style: {
+          "opacity": 1-Math.max(0, (scrollTop) / 60)
+        }
+      }
+    }
+  }
+}
