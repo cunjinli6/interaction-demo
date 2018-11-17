@@ -2,8 +2,9 @@
   "pages": [
     "pages/stick-top/stick-top",
     "pages/sidebar/sidebar",
+    "pages/swiper/swiper",
     "pages/movable/movable",
-    "pages/swiper/swiper"
+    "pages/videodemo/videodemo"
   ],
   "window": {
     "backgroundTextStyle": "light",

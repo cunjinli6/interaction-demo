@@ -1,0 +1,8 @@
+{
+  "disableScroll": true,
+  "window": {
+    "backgroundColor": "blue",
+    "navigationBarBackgroundColor": "#000"
+  },
+  "usingComponents": {}
+}

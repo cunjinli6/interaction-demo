@@ -1,0 +1,11 @@
+var func = function(event, instance) {
+  // console.log('111', JSON.stringify(source.event.detail))
+  var detail = event.detail
+  var redLine = instance.selectComponent('.red-line')[0]
+  redLine.setStyle({
+    left: (detail.x / 4) + 'px'
+  })
+}
+module.exports = {
+  func: func
+}

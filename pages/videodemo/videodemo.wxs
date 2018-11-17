@@ -1,0 +1,167 @@
+function GetSlideAngle(dx, dy) {
+  return Math.atan2(dy, dx) * 180 / Math.PI;
+}
+
+//根据起点和终点返回方向 1：向上，2：向下，3：向左，4：向右,0：未滑动 
+function GetSlideDirection(endX, endY, startX, startY) {
+  var dy = startY - endY;
+  var dx = startX - endX;
+  var result = 0;
+  //如果滑动距离太短 
+  if (Math.abs(dx) < 2 && Math.abs(dy) < 2) {
+    return result;
+  }
+  var angle = GetSlideAngle(dx, dy);
+  if (angle >= -45 && angle < 45) {
+    result = 4;
+  } else if (angle >= 45 && angle < 135) {
+    result = 1;
+  } else if (angle >= -135 && angle < -45) {
+    result = 2;
+  }
+  else if ((angle >= 135 && angle <= 180) || (angle >= -180 && angle < -135)) {
+    result = 3;
+  }
+  return result;
+}
+// 不可以在这里把ins存为局部变量, 无法回收
+function transitionEnd(event, ins) {
+  var data = ins.getData()
+  isTransition = false
+  // console.log('transitionend', JSON.stringify(event))
+  if (ismoveToNext) {
+    var currentVideo = ins.selectComponent('.current-video')[0]
+    currentVideo.setStyle('transform:translateY(' + (data.windowHeight) + 'px);')
+  }
+  ins.callMethod('transitionEnd', { moveToNext: ismoveToNext })
+}
+var startPos = { x: 0, y: 0 }
+var lastPos = {x: 0, y: 0}
+var direction = 0
+var ismoveToNext = false
+var isTransition = false
+// 下拉刷新的变量
+var refreshStatus = 0 // 0下拉加载刷新 1松开刷新 2加载中 3加载完成最后状态变成0
+module.exports = {
+  touchstart: function(event, ins) {
+    if (isTransition) return
+    var touch = event.touches[0]
+    lastPos = startPos = {y: touch.pageY, x: touch.pageX}
+    direction = 0
+  },
+  touchmove: function (event, ins) {
+    if (isTransition) return
+    var touch = event.touches[0]
+    var pos = { y: touch.pageY, x: touch.pageX }
+    if (!direction) {
+      direction = GetSlideDirection(pos.x, pos.y, startPos.x, startPos.y)
+    }
+    console.log('touchmove direction', direction)
+    var diffy = Math.abs(pos.y - startPos.y)
+    var diffx = Math.abs(pos.x - startPos.x)
+    if (direction == 1) {
+      // 向上滑动手势
+      var data = ins.getData()
+      // console.log('touchmove data', JSON.stringify(data))
+      var currentVideo = ins.selectComponent('.current-video')[0]
+      var nextVideo = ins.selectComponent('.next-video')[0]
+      currentVideo.setStyle('transform:translateY(' + (-diffy) + 'px);')
+      nextVideo.setStyle('transform:translateY(' + (data.windowHeight - diffy) + 'px)')
+      console.log('touch move direction 1 end', (data.windowHeight - diffy), diffy)
+    } else if (direction == 2) {
+      // 向下滑动手势
+      var downRefresh = ins.selectComponent('.down-refresh')[0]
+      // setStyle可以传object
+      downRefresh.setStyle({
+        transform: 'translateY('+Math.min(-30+diffy, 0)+'px)'
+      })
+      if (diffy >= 30 && refreshStatus === 0) {
+        ins.callMethod('looseToRefresh')
+        refreshStatus = 1
+      }
+      if (diffy < 30 && refreshStatus === 1) {
+        ins.callMethod('movedownRefresh')
+        refreshStatus = 0
+      }
+      // console.log('translateY', Math.min(-30 + diffy, 0))
+    }
+    lastPos = pos
+  },
+  touchend: function (event, ins) {
+    if (isTransition) return
+    var touch = event.touches[0] || event.changedTouches[0]
+    var pos = { y: touch.pageY, x: touch.pageX }
+    var diffy = Math.abs(pos.y - startPos.y)
+    // console.log('touchend direction', direction, touch.pageY, touch.pageX)
+    if (direction == 1) {
+      isTransition = true
+      var data = ins.getData()
+      var currentVideo = ins.selectComponent('.current-video')[0]
+      var nextVideo = ins.selectComponent('.next-video')[0]
+      // 移动距离大于50
+      if (diffy > data.windowHeight * 0.2) {
+        // console.log('move to next')
+        // currentVideo.setStyle('transform:translateY(' + (data.windowHeight) + 'px);-webkit-transition:transform 1s')
+        // nextVideo.setStyle('transform:translateY(0);-webkit-transition:transform 1s')
+        var totalTime = 300
+        var startTime = Date.now()
+        var next = function () {
+          if (Date.now() - startTime > totalTime) {
+            currentVideo.setStyle('transform:translateY(-100%);')
+            nextVideo.setStyle('transform:translateY(0);')
+            transitionEnd({}, ins)
+            return
+          }
+          var usetime = Date.now() - startTime
+          var currentDiff = Math.max(0, diffy + (data.windowHeight - diffy) * (usetime / totalTime))
+          var nextDiff = data.windowHeight - currentDiff
+          // console.log('diff', currentDiff, nextDiff)
+          currentVideo.setStyle('transform:translateY(' + (-currentDiff) + 'px);')
+          nextVideo.setStyle('transform:translateY(' + (nextDiff) + 'px);')
+          ins.requestAnimationFrame(next)
+        }
+        ins.requestAnimationFrame(next)
+        ismoveToNext = true
+      } else {
+        console.log('move to orignal position')
+        var totalTime = 300
+        var startTime = Date.now()
+        var next = function() {
+          if (Date.now() - startTime > totalTime) {
+            currentVideo.setStyle('transform:translateY(0px);')
+            nextVideo.setStyle('transform:translateY(100%);')
+            transitionEnd({}, ins)
+            return
+          }
+          var usetime = Date.now() - startTime
+          var currentDiff = Math.max(0, diffy - diffy * (usetime / totalTime))
+          var nextDiff = data.windowHeight - currentDiff
+          // console.log('diff', currentDiff, nextDiff)
+          currentVideo.setStyle('transform:translateY(' + (-currentDiff) + 'px);')
+          nextVideo.setStyle('transform:translateY(' + (nextDiff) + 'px);')
+          ins.requestAnimationFrame(next)
+        }
+        ins.requestAnimationFrame(next)
+        ismoveToNext = false
+      }
+    } else if (direction == 2) {
+      var downRefresh = ins.selectComponent('.down-refresh')[0]
+      // 松开加载的状态
+      if (diffy >= 30 && refreshStatus === 1) {
+        ins.callMethod('beginToRefresh', {
+          complete: function () {
+            downRefresh.setStyle({
+              transform: 'translateY(-30px)',
+              transition: 'transform 0.8s'
+            })
+            console.log('refresh complete')
+            ins.callMethod('refreshComplete')
+            refreshStatus = 0
+          }
+        })
+        refreshStatus = 2 // 加载中
+      }
+    }
+  },
+  transitionend: transitionEnd
+}

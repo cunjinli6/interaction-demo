@@ -26,20 +26,6 @@ Page({
     })
   },
   onReady() {
-    this.initInteraction()
-  },
-  initInteraction() {
-    this.ctx = wx.createInteraction({
-      selector: '.swiper',
-      event: ['transition']
-    }).addTarget({
-      selector: '.red-line',
-      eventHandleWithWxs: 'test.func'
-    }).start({
-      complete(res) {
-        console.log('add ok', res)
-      }
-    })
   },
   changeAutoplay: function (e) {
     this.setData({
