@@ -11,7 +11,7 @@
   autoplay="{{true}}" interval="{{interval}}" circular='{{true}}' duration="{{duration}}">
   <block wx:for="{{imgUrls}}">
     <swiper-item>
-      <image src="{{item}}" class="slide-image" style="width:100%;" height="200"/>
+      <image src="{{item}}" class="slide-image" style="width:100%;" height="300"/>
     </swiper-item>
   </block>
 </swiper>

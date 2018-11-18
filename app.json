@@ -1,8 +1,9 @@
 {
   "pages": [
+    "pages/index/index",
+    "pages/swiper/swiper",
     "pages/stick-top/stick-top",
     "pages/sidebar/sidebar",
-    "pages/swiper/swiper",
     "pages/movable/movable",
     "pages/videodemo/videodemo"
   ],

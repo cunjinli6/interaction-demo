@@ -1,0 +1,7 @@
+<!--pages/index/index.wxml-->
+<text>点击查看下面的DEMO：</text>
+<navigator style='display:block;line-height:40px;color:blue;' url='../movable/movable'>movable</navigator>
+<navigator style='display:block;line-height:40px;color:blue;' url='../sidebar/sidebar'>右滑显示左侧侧边栏</navigator>
+<navigator style='display:block;line-height:40px;color:blue;' url='../stick-top/stick-top'>滚动菜单栏贴顶</navigator>
+<navigator style='display:block;line-height:40px;color:blue;' url='../videodemo/videodemo'>微视的上拉切换视频，下拉刷新的效果</navigator>
+<navigator style='display:block;line-height:40px;color:blue;' url='../swiper/swiper'>跟随swiper的菜单效果</navigator>
